@@ -6,14 +6,14 @@ using QuickType;
 using System.Xml.XPath;
 using System.Collections.Generic;
 
-namespace RecUsedEdit
+namespace FixVSOpenRecent
 {
     class Program
     {
         static Func<FileEntry, bool> NotInPath(string s) => v => !v.Key.StartsWith(s, StringComparison.InvariantCultureIgnoreCase);
         static bool IsFav(FileEntry v) => v.Value.IsFavorite.GetValueOrDefault();
         static Func<FileEntry, bool> FavOrNewerThan(int n) =>
-            v => IsFav(v) || (v.Value.LastAccessed.HasValue && v.Value.LastAccessed.Value > (DateTime.Now - TimeSpan.FromDays(n)));
+            v => IsFav(v) || v.Value.LastAccessed.HasValue && v.Value.LastAccessed.Value > DateTime.Now - TimeSpan.FromDays(n);
 
         static void Main(string[] args)
         {
@@ -36,7 +36,7 @@ namespace RecUsedEdit
             Console.WriteLine(recentData.Count);
             Console.WriteLine(relevantData.Count);
 
-            recentNode.Value = Serialize.ToJson(relevantData);
+            recentNode.Value = relevantData.ToJson();
             using FileStream output = File.Open(@"c:\Users\thomas\AppData\Local\Microsoft\VisualStudio\16.0_19f5538c\ApplicationPrivateSettings.xml", FileMode.Truncate);
             doc.Save(output);
         }
